@@ -57,6 +57,12 @@ func main() {
 				Usage:   "root path to all Salt Minion common configuration",
 				Value:   "/etc/salt",
 			},
+			&cli.StringFlag{
+				Name:    "pem",
+				Aliases: []string{"k"},
+				Usage:   "minion public PEM key",
+				Value:   "/etc/salt/pki/minion/minion.pem",
+			},
 		},
 	}
 	err := app.Run(os.Args)
