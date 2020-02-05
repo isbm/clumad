@@ -4,7 +4,11 @@ import (
 	"bufio"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
+	"github.com/davecgh/go-spew/spew"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -27,9 +31,10 @@ const (
 // Cluster Director Stats
 type CDStats struct {
 	ClusterNodeFQDN string
-	PubKeyFP        string
+	pubKeyFP        string
 	Status          int
 	saltConfPath    string
+	cdURL           string
 }
 
 func NewCDStats() *CDStats {
@@ -40,6 +45,19 @@ func NewCDStats() *CDStats {
 // Set Salt configuration directory
 func (cds *CDStats) SetSaltConfigDir(confpath string) *CDStats {
 	cds.saltConfPath = confpath
+	return cds
+}
+
+// Set Salt configuration directory
+func (cds *CDStats) SetPubKeyFP(fp string) *CDStats {
+	cds.pubKeyFP = fp
+	return cds
+}
+
+// SetClusterDirectorURL sets the main url of the Cluster Director API endpoint,
+// or the main entry URL to the entire cluster.
+func (cds *CDStats) SetClusterDirectorURL(url string) *CDStats {
+	cds.cdURL = url
 	return cds
 }
 
@@ -80,4 +98,20 @@ func (cds *CDStats) GetPubKeyFp(keypath string) string {
 	}
 
 	return fp
+}
+
+// UpdateStats calls Cluster Director with the current Salt Minion fingerprint,
+// and fetches current registered machine status and Cluster Node FQDN.
+func (cds *CDStats) UpdateStats() {
+	req := url.Values{
+		"pem": {cds.pubKeyFP},
+	}
+	resp, err := http.PostForm(cds.cdURL, req)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	var ret map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&ret)
+	spew.Dump(ret)
+	ret = nil
 }
