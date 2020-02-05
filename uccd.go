@@ -14,6 +14,7 @@ type Uccd struct {
 	masterFqdn    string
 	minionCfgPath string
 	pingInterval  int64
+	pem           string
 }
 
 func NewUccd() *Uccd {
@@ -22,6 +23,7 @@ func NewUccd() *Uccd {
 	d.cdstats = NewCDStats()
 	d.pinger = NewPinger()
 	d.pingInterval = 10
+	d.pem = "pki/minion/minion.pub"
 
 	return d
 }
@@ -48,7 +50,7 @@ func (d *Uccd) setup() {
 	d.sysop.GetSaltOps().SetConfDOption("minion", "master", d.masterFqdn)
 
 	// Set pubkey PEM fingerprint
-	d.cdstats.SetPubKeyFP(d.cdstats.GetPubKeyFp("pki/minion/minion.pub"))
+	d.cdstats.SetPubKeyFP(d.cdstats.GetPubKeyFp(d.pem))
 }
 
 // SetSaltConfigPath sets configuration path to the Salt Minion
@@ -76,6 +78,12 @@ func (d *Uccd) SetClusterURL(url string) *Uccd {
 	return d
 }
 
+// SetMinionPEMPubKey sets PEM public key of the current minion
+func (d *Uccd) SetMinionPEMPubKey(pem string) *Uccd {
+	d.pem = pem
+	return d
+}
+
 // Pinger loop is used to gather physical networn statistics to the Cluster Node.
 func (d *Uccd) pingerLoop() {
 	for {
@@ -94,6 +102,7 @@ func (d *Uccd) pingerLoop() {
 // Salt Minion is reconfigured and then restarted against
 // new Salt Master.
 func (d *Uccd) heartbeatLoop() {
+
 	for {
 		fmt.Println("Poke")
 		time.Sleep(time.Duration(d.pingInterval) * time.Second)

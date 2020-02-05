@@ -31,11 +31,31 @@ func which(bin string, defaultPath string) string {
 }
 
 func run(ctx *cli.Context) error {
+	var saltconf string
+	var minion string
+	var url string
+	var pem string
+
+	if ctx.String("conf") != "" {
+		config := uccd.NewConfig(ctx.String("conf"))
+		saltconf = config.String("salt-conf", ctx.String("saltconf"))
+		minion = config.String("minion-exec", ctx.String("minion"))
+		url = config.String("director-url", ctx.String("url"))
+		pem = config.String("minion-pem-key", ctx.String("pem"))
+	} else {
+		saltconf = ctx.String("saltconf")
+		minion = ctx.String("minion")
+		url = ctx.String("url")
+		pem = ctx.String("pem")
+	}
+
 	daemon := uccd.NewUccd().
-		SetSaltConfigPath(ctx.String("saltconf")).
-		SetSaltExec(ctx.String("minion")).
-		SetClusterURL(ctx.String("url"))
+		SetSaltConfigPath(saltconf).
+		SetSaltExec(minion).
+		SetClusterURL(url).
+		SetMinionPEMPubKey(pem)
 	daemon.Start()
+
 	return nil
 }
 
@@ -65,10 +85,14 @@ func main() {
 				Value:   "/etc/salt/pki/minion/minion.pem",
 			},
 			&cli.StringFlag{
-				Name:     "url",
-				Aliases:  []string{"u"},
-				Usage:    "public URL to the Cluster Director main entry",
-				Required: true,
+				Name:    "url",
+				Aliases: []string{"u"},
+				Usage:   "public URL to the Cluster Director main entry",
+			},
+			&cli.StringFlag{
+				Name:    "conf",
+				Aliases: []string{"c"},
+				Usage:   "mgr-uccd configuration file",
 			},
 		},
 	}

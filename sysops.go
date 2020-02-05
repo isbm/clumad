@@ -70,28 +70,13 @@ func (sop *SaltOps) GetConfOpion(conf string, key string) interface{} {
 
 // Get YAML content
 func (sop *SaltOps) getConfStruct(conf string) map[string]interface{} {
-	var confContent map[string]interface{}
 	var confFile string
 	if strings.Contains(conf, "/") { // Assumed relative or absolute path
 		confFile = conf
 	} else {
 		confFile = path.Join(sop.confpath, conf)
 	}
-	fh, err := os.Open(confFile)
-	if err != nil {
-		confContent = make(map[string]interface{})
-		return confContent
-	} else {
-		defer fh.Close()
-	}
-	confmap, err := ioutil.ReadAll(fh)
-	if err != nil {
-		panic("Error reading config: " + err.Error())
-	}
-	if err := yaml.Unmarshal(confmap, &confContent); err != nil {
-		panic("Error parsing config: " + err.Error())
-	}
-	return confContent
+	return NewConfig(confFile).GetContent()
 }
 
 // Backup main configuration file, if it wasnt.
