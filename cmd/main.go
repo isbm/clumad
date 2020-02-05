@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/isbm/clumad"
+	"github.com/isbm/go-nanoconf"
 	"github.com/urfave/cli/v2"
 	"io/ioutil"
 	"log"
@@ -37,7 +38,7 @@ func run(ctx *cli.Context) error {
 	var pem string
 
 	if ctx.String("conf") != "" {
-		config := uccd.NewConfig(ctx.String("conf"))
+		config := nanoconf.NewConfig(ctx.String("conf"))
 		saltconf = config.String("salt-conf", ctx.String("saltconf"))
 		minion = config.String("minion-exec", ctx.String("minion"))
 		url = config.String("director-url", ctx.String("url"))

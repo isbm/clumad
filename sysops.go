@@ -3,6 +3,7 @@ package uccd
 import (
 	"fmt"
 	"github.com/go-yaml/yaml"
+	"github.com/isbm/go-nanoconf"
 	"io"
 	"io/ioutil"
 	"os"
@@ -76,7 +77,7 @@ func (sop *SaltOps) getConfStruct(conf string) map[string]interface{} {
 	} else {
 		confFile = path.Join(sop.confpath, conf)
 	}
-	return NewConfig(confFile).GetContent()
+	return nanoconf.NewConfig(confFile).GetContent()
 }
 
 // Backup main configuration file, if it wasnt.

@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-yaml/yaml v2.1.0+incompatible
+	github.com/isbm/go-nanoconf v0.0.0-20200205211009-9fa3a02292ad
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/sparrc/go-ping v0.0.0-20190613174326-4e5b6552494c
 	github.com/urfave/cli/v2 v2.1.1
