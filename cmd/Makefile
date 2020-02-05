@@ -1,4 +1,4 @@
-OUT := clumad
+OUT := mgr-uccd
 DISTRO := $(shell cat /etc/os-release | grep '^NAME=' | sed -e 's/.*=//')
 GCCGO :=
 GO :=
