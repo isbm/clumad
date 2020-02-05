@@ -1,4 +1,4 @@
-package clumad
+package uccd
 
 import (
 	"github.com/sparrc/go-ping"
