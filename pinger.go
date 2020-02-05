@@ -25,7 +25,7 @@ func (p *Pinger) Ping(addr string) *ping.Statistics {
 			panic("Unabpe to initialise pinger to the address " + addr + ": " + err.Error())
 		}
 		p.pinger.Count = 3
-		p.pinger.SetPrivileged(true)
+		p.pinger.SetPrivileged(true) // Still needs a raw socket capability to be set
 		p.pinger.Run()
 		stats = p.pinger.Statistics()
 		p.pinger = nil
