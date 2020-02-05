@@ -16,6 +16,7 @@ import (
 // SaltOps object
 type SaltOps struct {
 	confpath   string
+	execpath   string
 	saltminion *exec.Cmd
 }
 
@@ -26,8 +27,14 @@ func NewSaltOps() *SaltOps {
 }
 
 // SetSaltConfigDir sets Salt configuration directory
-func (sop *SaltOps) SetSaltConfigDir(path string) *SaltOps {
-	sop.confpath = path
+func (sop *SaltOps) SetSaltConfigDir(cfgdir string) *SaltOps {
+	sop.confpath = cfgdir
+	return sop
+}
+
+// SetSaltConfigDir sets Salt configuration directory
+func (sop *SaltOps) SetSaltExecPath(execpath string) *SaltOps {
+	sop.execpath = execpath
 	return sop
 }
 
@@ -134,11 +141,11 @@ func (sop *SaltOps) SetConfOption(conf string, key string, value interface{}) {
 
 // SetConfOption writes a configuration option to a .d "drop-in" config file.
 // If parameter conf is already a full path, it will be used.
-// Otherwise new config file "/path/to/foo.d/clumad.conf" will be used.
+// Otherwise new config file "/path/to/foo.d/mgr-uccd.conf" will be used.
 func (sop *SaltOps) SetConfDOption(conf string, key string, value interface{}) {
 	var confPath string
 	if !strings.Contains(conf, "/") { // Assume new drop-in should be created
-		confPath = path.Join(sop.confpath, conf+".d", "clumad.conf")
+		confPath = path.Join(sop.confpath, conf+".d", "mgr-uccd.conf")
 	} else {
 		confPath = conf
 	}
@@ -147,8 +154,11 @@ func (sop *SaltOps) SetConfDOption(conf string, key string, value interface{}) {
 
 // StartSaltMinion starts Salt Minion in background and watches it.
 func (sop *SaltOps) StartSaltMinion() {
+	// TODO: Integrate with the D-Bus for systemd
+
+	// Direct start as a child process with grandchildren forks
 	if sop.saltminion == nil {
-		sop.saltminion = exec.Command("salt-minion", "-l", "debug")
+		sop.saltminion = exec.Command(sop.execpath, "-l", "debug")
 		sop.saltminion.Env = append(os.Environ(), "FOO=BAR")
 		sop.saltminion.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 		if err := sop.saltminion.Start(); err != nil {
