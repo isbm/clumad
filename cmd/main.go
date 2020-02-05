@@ -33,7 +33,8 @@ func which(bin string, defaultPath string) string {
 func run(ctx *cli.Context) error {
 	daemon := uccd.NewUccd().
 		SetSaltConfigPath(ctx.String("saltconf")).
-		SetSaltExec(ctx.String("minion"))
+		SetSaltExec(ctx.String("minion")).
+		SetClusterURL(ctx.String("url"))
 	daemon.Start()
 	return nil
 }
@@ -62,6 +63,12 @@ func main() {
 				Aliases: []string{"k"},
 				Usage:   "minion public PEM key",
 				Value:   "/etc/salt/pki/minion/minion.pem",
+			},
+			&cli.StringFlag{
+				Name:     "url",
+				Aliases:  []string{"u"},
+				Usage:    "public URL to the Cluster Director main entry",
+				Required: true,
 			},
 		},
 	}
