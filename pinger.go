@@ -28,6 +28,7 @@ func (p *Pinger) Ping(addr string) *ping.Statistics {
 		p.pinger.SetPrivileged(true)
 		p.pinger.Run()
 		stats = p.pinger.Statistics()
+		p.pinger = nil
 	}
 	return stats
 }
