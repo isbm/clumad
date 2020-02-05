@@ -7,8 +7,9 @@ import (
 )
 
 type Uccd struct {
-	sysop  *SysOp
-	pinger *Pinger
+	sysop   *SysOp
+	pinger  *Pinger
+	cdstats *CDStats
 
 	masterFqdn    string
 	minionCfgPath string
@@ -18,6 +19,7 @@ type Uccd struct {
 func NewUccd() *Uccd {
 	d := new(Uccd)
 	d.sysop = NewSysOp()
+	d.cdstats = NewCDStats()
 	d.pinger = NewPinger()
 	d.pingInterval = 10
 
@@ -44,11 +46,15 @@ func (d *Uccd) setup() {
 		d.masterFqdn = "localhost"
 	}
 	d.sysop.GetSaltOps().SetConfDOption("minion", "master", d.masterFqdn)
+
+	// Set pubkey PEM fingerprint
+	d.cdstats.SetPubKeyFP(d.cdstats.GetPubKeyFp("pki/minion/minion.pub"))
 }
 
 // SetSaltConfigPath sets configuration path to the Salt Minion
 func (d *Uccd) SetSaltConfigPath(confpath string) *Uccd {
 	d.sysop.GetSaltOps().SetSaltConfigDir(confpath)
+	d.cdstats.SetSaltConfigDir(confpath)
 	return d
 }
 
@@ -61,6 +67,12 @@ func (d *Uccd) SetSaltExec(execpath string) *Uccd {
 // SetPingTimeDuration sets ping pause duration to ping Cluster Node
 func (d *Uccd) SetPingTimeDuration(duration int64) *Uccd {
 	d.pingInterval = duration
+	return d
+}
+
+// SetClusterURL sets cluster main entry URL
+func (d *Uccd) SetClusterURL(url string) *Uccd {
+	d.cdstats.SetClusterDirectorURL(url)
 	return d
 }
 
