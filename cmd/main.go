@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/isbm/clumad"
 	"github.com/urfave/cli/v2"
 	"io/ioutil"
 	"log"
@@ -30,6 +31,10 @@ func which(bin string, defaultPath string) string {
 }
 
 func run(ctx *cli.Context) error {
+	daemon := uccd.NewUccd().
+		SetSaltConfigPath(ctx.String("saltconf")).
+		SetSaltExec(ctx.String("minion"))
+	daemon.Start()
 	return nil
 }
 
@@ -45,6 +50,12 @@ func main() {
 				Aliases: []string{"m"},
 				Usage:   "path to Salt Minion executable",
 				Value:   which("salt-minion", "/usr/bin"),
+			},
+			&cli.StringFlag{
+				Name:    "saltconf",
+				Aliases: []string{"s"},
+				Usage:   "root path to all Salt Minion common configuration",
+				Value:   "/etc/salt",
 			},
 		},
 	}
