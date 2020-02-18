@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/isbm/clumad"
+	"github.com/isbm/uyuni-ccd"
 	"github.com/isbm/go-nanoconf"
 	"github.com/urfave/cli/v2"
 	"io/ioutil"

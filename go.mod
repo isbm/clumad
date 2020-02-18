@@ -1,4 +1,4 @@
-module github.com/isbm/clumad
+module github.com/isbm/uyuni-ccd
 
 go 1.13
 
